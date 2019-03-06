@@ -7,5 +7,5 @@
 void main( int argc ,const char *argv[])
 {
  concat(argc,argv);
-
+ printf("\n");
 }
