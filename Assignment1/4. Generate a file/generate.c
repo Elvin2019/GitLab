@@ -13,7 +13,8 @@ int main(int argc ,const char *argv[])
 	x = strtol(argv[1],NULL,10);
     
     fileptr = fopen(filechar, "a+");
-    fseek(fileptr,x,SEEK_SET);
-    fclose(fileptr);
+    //fseek(fileptr,x,SEEK_SET);
+    ftruncate(fileno(fileptr),x);
+	fclose(fileptr);
     return 0;
 }

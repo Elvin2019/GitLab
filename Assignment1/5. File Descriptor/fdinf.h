@@ -1,6 +1,8 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 int fdinfo(int fd){
-
-
 	int flag = fcntl(fd, F_GETFD);
     if((flag & FD_CLOEXEC)== 0 ){
     printf("fd: %u\n", fd);
@@ -31,6 +33,6 @@ int fdinfo(int fd){
 	else{
 	printf("\n file doesnt exist \n");
 	}
-    return 1;
+    return -1;
 
 }
