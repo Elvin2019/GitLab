@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
- 
+#include <unistd.h>
+#include <stdlib.h>
+
 int main()
 {
     FILE *fileptr;
@@ -20,7 +22,7 @@ int main()
     }
     fclose(fileptr); //close file.
 	printf("Enter file name : ");
-    scanf("%s", filechar);
+	scanf("%s", filechar);
 	fileptr = fopen(filechar,"w");
 	fputs(data,fileptr);
     return 0;

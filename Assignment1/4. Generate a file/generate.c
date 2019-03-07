@@ -6,7 +6,7 @@
 int main(int argc ,const char *argv[])
 {
     FILE *fileptr;
-    int x;
+    int x ;
     char filechar[40];
 
     strcpy(filechar,argv[1]);
