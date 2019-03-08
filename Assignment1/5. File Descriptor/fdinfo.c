@@ -7,5 +7,4 @@ void main(int argc, const char *argv[]){
 
  fdinfo(strtol(argv[1],NULL,10));
  
- return 1;
  }
