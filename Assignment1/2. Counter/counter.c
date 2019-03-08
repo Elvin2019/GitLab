@@ -35,7 +35,7 @@ int main(int argc, const char *argv[])
     int count_lines = 0, count_words=0,max_length=0,min_length=0,errnum,result;
     char filechar[40], chr;
  
-    strcpy(filechar,argv[1]);
+    printf("Enter file name:");
     scanf("%s", filechar);
     fileptr = fopen(filechar, "r");
 	if (fileptr == NULL) {
