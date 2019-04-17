@@ -6,6 +6,8 @@
 #include <sys/wait.h>
 #include <inttypes.h>
 #include <sys/times.h>
+#include <sys/resource.h>
+
 
 #ifndef BUFFSIZE
 #define BUFFSIZE 4096
@@ -19,19 +21,18 @@
 #define MAX_NUMBER_OF_PARAMS 10
 #endif
 
-
+#define true  1
+#define false 0
 
 void parseCmd(char* command, char** params);
 int executeCmd(char** params);
 
 struct tms start_tms;
 struct tms end_tms;
+struct rusage res_mem;
+struct rlimit limit;
 
-
-#define true  1
-#define false 0
-
-
+clock_t  start, end;
 
 char *str_buff;
 int line = false;
@@ -47,13 +48,13 @@ int main()
     char get[BUFFSIZE];
 	
     str_buff = malloc(sizeof(char) * BUFFSIZE);
-	int c = 0;
+	
 	
 	getcwd(get, BUFFSIZE); //getting path 
 	for ( ; ; ) {
 	   //printf("%s@ >> ", getenv("USER")); //print user name + >> shell mark
 		//if (fgetc(stdin) == sizeof(command)) continue;       
-	   c++;
+	   
 	   if(line){
 		   printf(">");
         	}else if((getenv("HOME")!= NULL) && (strcmp(getenv("HOME"), get) == false)){
@@ -68,6 +69,9 @@ int main()
         if(command[strlen(command)-1] == '\n') {
             command[strlen(command)-1] = '\0';
         }
+		if(strcmp(params[0],"-r") == false){
+		strcat(Cpu_time, )
+		}
 		
 		parseCmd(command, params); //splitting given command into parameters
         
@@ -108,7 +112,9 @@ int executeCmd(char** params)
     
 
 	pid_t pid = fork();
+	start = times(&start_tms);
 	times(&start_tms);
+	
 	/*
     printf("Test start_tms.tms_utime = %jd\n\n",  (intmax_t)start_tms.tms_utime);
     printf("Test start_tms.tms_stime = %jd\n\n",  (intmax_t)start_tms.tms_stime);
@@ -131,24 +137,30 @@ int executeCmd(char** params)
     // Parent process
     else {
         // Wait for child process to finish
-        int childStatus;
+		char *str;
+		int childStatus;
         waitpid(pid, &childStatus, 0);
-    
+		end = times(&end_tms);
 		times(&end_tms);
+		getrusage(RUSAGE_SELF, &res_mem);
+		getrlimit(RLIMIT_CPU, &limit)
+		setrlimit(RLIMIT_CPU, &limit)
+		
 		
 		/*
         printf("Test end_tms.tms_utime = %jd\n\n",end_tms.tms_utime);
         printf("Test end_tms.tms_stime = %jd\n\n",end_tms.tms_stime);
 		*/
        
-        
+        clock_t real = (end - start)/100; //real time 
         clock_t utime = end_tms.tms_utime - start_tms.tms_utime;
         clock_t stime = end_tms.tms_stime - start_tms.tms_stime;
-        clock_t real;
-
-      	printf("Real time %jd\n\n", (intmax_t)real);
-        printf("User CPU time %jd\n\n", (intmax_t)utime);
-        printf("System CPU %jd\n\n", (intmax_t)stime);
+        
+		
+      	printf("Real time %jd\n\n", (intmax_t)real); //extra - real time 
+        printf("User CPU time %jd\n\n", (intmax_t)utime); //User CPU time
+        printf("System CPU %jd\n\n", (intmax_t)stime); // system CPU time
+		printf("Residential memory: %ld\n",res_mem.ru_maxrss); //mempry used on process
 		
 	
 		return true;
