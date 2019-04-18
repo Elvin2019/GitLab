@@ -24,18 +24,22 @@
 #define true  1
 #define false 0
 
-void parseCmd(char* command, char** params);
-int executeCmd(char** params);
+void parse_Command(char* command, char** params);
+void operate_and(int command, char** params);
+int exec_Command(char** params);
+
 
 struct tms start_tms;
 struct tms end_tms;
 struct rusage res_mem;
 struct rlimit limit;
-
+struct rlimit lim_mem;
 clock_t  start, end;
 
-char *str_buff;
+int *buff;
 int line = false;
+int store = 0;
+int count = 0;
 
 
 
@@ -43,11 +47,10 @@ int main()
 {
     char command[MAX_COMMAND_LENGTH ];
     char* params[MAX_NUMBER_OF_PARAMS];
-    int cmdCount = 0;
+    int c = 0;
 	printf("Welcome to Simple shell: \n");
     char get[BUFFSIZE];
 	
-    str_buff = malloc(sizeof(char) * BUFFSIZE);
 	
 	
 	getcwd(get, BUFFSIZE); //getting path 
@@ -72,9 +75,9 @@ int main()
 		/*if(strcmp(params[0],"-r") == false){
 		//strcat(Cpu_time, )
 		}*/
-		
-		parseCmd(command, params); //splitting given command into parameters
-        
+		c++;
+		parse_Command(command, params); //splitting given command into parameters
+     //operate_and(c, params); //need to complete
      //	if(strcmp(params[c], "&&") == true && strcmp(params[c+1], "&&") == false) continue;	
 		if(strcmp(params[0], "exit") == false){
 			break;  //if first argument equal to exit them exit from shell
@@ -82,20 +85,20 @@ int main()
 		if(strcmp(params[0], "") == false){
 			continue; //if just press enter it continues untill exit
 		}
-        if(executeCmd(params) == false){ 
+        if(exec_Command(params) == false){ 
 			break;
 		}		//executig command
 			
   
   }
-	//printf("\n");
+	printf("\n");
     return 0;
 }
 
 // Split cmd into array of parameters
-void parseCmd(char* command, char** params)
+void parse_Command(char* command, char** params)
 {       	
-	int count = 0;
+	
     for(int i = 0; i < MAX_NUMBER_OF_PARAMS; i++) {
         params[i] = strsep(&command, " "); 
 	if(params[i] == NULL){
@@ -107,7 +110,27 @@ void parseCmd(char* command, char** params)
 
 
 
-int executeCmd(char** params)
+void operate_and(int command, char** params)
+{       	
+	buff = malloc(sizeof(int) * BUFFSIZE);
+
+    for(int i = 0; i < command; ++i) {
+		if(strcmp(params[i], "&&") == false){
+			store = 1;
+			buff[count] = i;
+			count++;
+		}
+	}
+	if(store == true){
+		if(strcmp(params[command -1], "&&") ==false){
+		}else {
+			buff[count] = command;
+			count++;
+			}
+		}
+	
+}
+int exec_Command(char** params)
 {
     // Fork process
     
@@ -146,14 +169,21 @@ int executeCmd(char** params)
 		getrusage(RUSAGE_SELF, &res_mem); //get memory 
 		
 		getrlimit(RLIMIT_CPU, &limit);
-		printf("\n Default CPU_time is : %lld\n", (long long int)limit.rlim_cur);
-		scanf("%lld",&limit.rlim_cur);
-		printf("Set CPU time limit: ");
-		setrlimit(RLIMIT_CPU, &limit);
-		printf("\n Default value now is : %lld\n", (long long int)limit.rlim_cur); 
+		getrlimit (RLIMIT_AS, &lim_mem); 
+		//printf("\nDefault CPU_time is : %lld\n\n", (long long int)limit.rlim_cur);
+		//printf("\n Default value is : %lld\n", (long long int)rl.rlim_cur); 
 
+		printf("Set CPU time limit: ");
+		scanf("%ld",&limit.rlim_cur);
 		
-		
+		printf("Set Virtual memory limit: ");
+		scanf("%ld",&lim_mem.rlim_cur);
+
+		setrlimit(RLIMIT_CPU, &limit);
+		setrlimit (RLIMIT_AS, &lim_mem); 
+		printf("\nRestricted CPU time now is : %lld\n", (long long int)limit.rlim_cur); 
+		printf("Restricted Virtual memory now is : %lld\n\n", (long long int)lim_mem.rlim_cur); 
+
 		/*
         printf("Test end_tms.tms_utime = %jd\n\n",end_tms.tms_utime);
         printf("Test end_tms.tms_stime = %jd\n\n",end_tms.tms_stime);
@@ -167,8 +197,8 @@ int executeCmd(char** params)
       	printf("Real time %jd\n\n", (intmax_t)real); //extra - real time 
         printf("User CPU time %jd\n\n", (intmax_t)utime); //User CPU time
         printf("System CPU %jd\n\n", (intmax_t)stime); // system CPU time
-		printf("Residential memory: %ld\n",res_mem.ru_maxrss); //mempry used on process
-		
+		printf("Residential memory: %ld\n\n",res_mem.ru_maxrss); //mempry used on process
+	
 	
 		return true;
     
