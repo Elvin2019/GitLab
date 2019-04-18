@@ -69,9 +69,9 @@ int main()
         if(command[strlen(command)-1] == '\n') {
             command[strlen(command)-1] = '\0';
         }
-		if(strcmp(params[0],"-r") == false){
-		strcat(Cpu_time, )
-		}
+		/*if(strcmp(params[0],"-r") == false){
+		//strcat(Cpu_time, )
+		}*/
 		
 		parseCmd(command, params); //splitting given command into parameters
         
@@ -103,6 +103,7 @@ void parseCmd(char* command, char** params)
 		}
 	}
 }
+
 
 
 
@@ -142,9 +143,15 @@ int executeCmd(char** params)
         waitpid(pid, &childStatus, 0);
 		end = times(&end_tms);
 		times(&end_tms);
-		getrusage(RUSAGE_SELF, &res_mem);
-		getrlimit(RLIMIT_CPU, &limit)
-		setrlimit(RLIMIT_CPU, &limit)
+		getrusage(RUSAGE_SELF, &res_mem); //get memory 
+		
+		getrlimit(RLIMIT_CPU, &limit);
+		printf("\n Default CPU_time is : %lld\n", (long long int)limit.rlim_cur);
+		scanf("%lld",&limit.rlim_cur);
+		printf("Set CPU time limit: ");
+		setrlimit(RLIMIT_CPU, &limit);
+		printf("\n Default value now is : %lld\n", (long long int)limit.rlim_cur); 
+
 		
 		
 		/*
