@@ -3,11 +3,17 @@
 #include <unistd.h>   
 #include <string.h>   
 #include <signal.h>
+
+#define true  1
+#define false 0
+
 static struct sigaction sa;
 static struct sigaction old_sa;
+
 void handler(int );
 void my_sleep(int );
 void alarm_handler(int );
+
 void alarm_handler(int signal) {
     if (signal != SIGALRM) {
         fprintf(stderr, "Caught wrong signal: %d\n", signal);
@@ -15,9 +21,10 @@ void alarm_handler(int signal) {
 
     printf("Got sigalrm, do_sleep() will end\n");
 }
+
 void handler(int sgn)
 {
-const char *signal_name;
+//const char *signal_name;
 sigset_t pending;
 printf("SIGQUIT recorded\n");
 printf("Now Wait For 5 Seconds to get other signal\n");
@@ -53,6 +60,7 @@ sigdelset(&mask, SIGALRM);
 alarm(sec);
 sigsuspend(&mask);
 }
+
 int main() 
 {  
 char str[100];
@@ -63,12 +71,12 @@ sigfillset(&sa.sa_mask);
 if (sigaction(SIGQUIT, &sa, NULL) == -1) {
         perror("Error: cannot handle SIGQUIT"); // Should not happen
 }
-   while(1)
+   while(true)
    {
-      write(1,"Enter Text :\n",14);
-      len=read(0,str,100);
+      write(1,"Enter Text :\n",14); 
+      len=read(0,str,100); //reading standart input
       write(1,"Given Text :\n",14);
-      write(1,str,len);
+      write(1,str,len); //write standart output
       memset(str,EOF,100);
    } 
 
