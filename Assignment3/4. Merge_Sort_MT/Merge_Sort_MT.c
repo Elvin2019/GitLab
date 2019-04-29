@@ -5,38 +5,39 @@
 #define NOTHREADS 2
 
 
-int a[] = {10, 8, 5, 2, 3, 6, 7, 1, 4, 9};
+int arr[] = {1024, 2048, 8, 2, 16, 4, 32, 128, 64, 256, 512};
 
 typedef struct node {
-    int i;
-    int j;
+    int left;
+    int right;
 } NODE;
 
-void merge(int i, int j)
+void merge(int left, int right)  
 {
-        int mid = (i+j)/2;
-        int ai = i;
-        int bi = mid+1;
-
-        int newa[j-i+1], newai = 0;
-
-        while(ai <= mid && bi <= j) {
-                if (a[ai] > a[bi])
-                        newa[newai++] = a[bi++];
+		int m, ar, br;
+		int s[right - left + 1], sr = 0;	
+		
+		m = (left + right)/2;  //m - middle
+		ar = left;
+        br = m+1;
+		
+        while(ar <= m && br <= right) {
+                if (arr[ar] > arr[br])
+                        s[sr++] = arr[br++];
                 else                    
-                        newa[newai++] = a[ai++];
+                        s[sr++] = arr[ar++];
         }
 
-        while(ai <= mid) {
-                newa[newai++] = a[ai++];
+        while(ar <= m) {
+                s[sr++] = arr[ar++];
         }
 
-        while(bi <= j) {
-                newa[newai++] = a[bi++];
+        while(br <= right) {
+                s[sr++] = arr[br++];
         }
 
-        for (ai = 0; ai < (j-i+1) ; ai++)
-                a[i+ai] = newa[ai];
+        for (ar = 0; ar < (right-left+1) ; ar++)
+                arr[left+ar] = s[ar];
 
 }
 
@@ -44,59 +45,55 @@ void * mergesort(void *a)
 {
         NODE *p = (NODE *)a;
         NODE n1, n2;
-        int mid = (p->i+p->j)/2;
+        int mid = (p->left+p->right)/2;
         pthread_t tid1, tid2;
         int ret;
 
-        n1.i = p->i;
-        n1.j = mid;
+        n1.left = p->left;
+        n1.right = mid;
 
-        n2.i = mid+1;
-        n2.j = p->j;
+        n2.left = mid+1;
+        n2.right = p->right;
 
-        if (p->i >= p->j) return "0";
+        if (p->left >= p->right) return "0";
 
         ret = pthread_create(&tid1, NULL, mergesort, &n1);
-        if (ret) {
-                printf("%d %s - unable to create thread - ret - %d\n", __LINE__, __FUNCTION__, ret);    
-                exit(1);
-        }
-
+      
 
         ret = pthread_create(&tid2, NULL, mergesort, &n2);
-        if (ret) {
-                printf("%d %s - unable to create thread - ret - %d\n", __LINE__, __FUNCTION__, ret);    
-                exit(1);
-        }
-
+       
         pthread_join(tid1, NULL);
         pthread_join(tid2, NULL);
 
-        merge(p->i, p->j);
+        merge(p->left, p->right);
         pthread_exit(NULL);
 }
 
 
 int main()
 {
-        int i;
+		
+		int i, len;
+		len = sizeof(arr) / sizeof(int); 
+		printf("Given array: \n");
+		for (i = 0; i < len; i++){
+                    printf ("%d ", arr[i]);
+        }
+		printf("\n");
         NODE m;
-        m.i = 0;
-        m.j = 9;
-        pthread_t tid;
-
+        m.left = 0;
+        m.right = len - 1;
+        
+		pthread_t tid;
         int ret; 
 
         ret=pthread_create(&tid, NULL, mergesort, &m);
-        if (ret) {
-                printf("%d %s - unable to create thread - ret - %d\n", __LINE__, __FUNCTION__, ret);    
-                exit(1);
-        }
-
+       
+	   
         pthread_join(tid, NULL);
-
-        for (i = 0; i < 10; i++)
-                        printf ("%d ", a[i]);
+		printf("Sorted array: \n");
+        for (i = 0; i < len; i++)
+                    printf ("%d ", arr[i]);
 
         printf ("\n");
 
