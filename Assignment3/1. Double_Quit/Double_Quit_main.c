@@ -5,8 +5,8 @@
 #include <signal.h>
 
 static struct sigaction sa;
-static int sig_chk=0;//alarm done
-static int ss_tm=0;//alarm done
+static int sig_chk = 0;//alarm done
+static int ss_tm = 0;//alarm done
 
 void handler(int );
 void my_sleep(int );
@@ -14,11 +14,11 @@ void alarm_handler(int );
 
 void alarm_handler(int signal)
 {
-    sig_chk=1;
+    sig_chk = 1;
     sigset_t pending;
     if (sigismember(&pending, SIGQUIT)) {
        //printf("Caught Second Time, So exit\n"); 
-        ss_tm=1;
+        ss_tm = 1;
     }
 }
 
@@ -26,12 +26,12 @@ void handler(int sgn)
 {
 	static int cnt=0;
 	cnt++;
-	if((cnt==2) && (sig_chk != 1)){ //means before 5 sec another signal come 
+	if((cnt == 2) && (sig_chk != 1)){ //means before 5 sec another signal come 
 		printf(" Double quit signal before 5 Sec\n");
 		cnt=0;
 		exit(0);
 	}
-	else if((cnt==2) && (sig_chk == 1)){ //means second signal comes after 5 sec means reinit
+	else if((cnt == 2) && (sig_chk == 1)){ //means second signal comes after 5 sec means reinit
 		cnt=1;
 		sig_chk = 0;
 	}
