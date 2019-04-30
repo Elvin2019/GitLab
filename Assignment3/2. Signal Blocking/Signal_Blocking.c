@@ -13,10 +13,10 @@ const char *signal_name;
 //static int signal;
 void grp_handle(int );
 
-void grp_handle(int sign) {
+void grp_handle(int signal) {
     sigset_t pending;
     // Find out which signal we're handling
-    switch (sign) {
+    switch (signal) {
         case SIGQUIT:
             signal_name = "SIGQUIT";
             //sa.sa_flags = SA_RESTART;
@@ -38,15 +38,11 @@ void grp_handle(int sign) {
 }
 int main(int argc, char* argv[])
 {
-	int sFp,dFp,nbr,nbw;
+	int sFp,dFp,nbr; //sFp - source file open , dFp - destinition file open , nbr - n byte read
 	char *buff[1024];
 
-	printf("My pid is: %d\n", getpid());
-	if(argc != 3 || argv[1] == "--help"){
-	printf("\nUsage: executable source_file destination_file\n");
-	exit(EXIT_FAILURE);
-	}
- 
+	printf("My pid is: %d\n", getpid()); // process id -- it will be useful to kill process for handling SIGTERM signal
+	
 /*Open source file*/
 	sFp = open(argv[1],O_RDONLY);
 	if(sFp == -1){
@@ -77,41 +73,42 @@ int main(int argc, char* argv[])
 	if (sigaction(SIGTERM, &sa, &old_sa) == -1) {
 		perror("Error: cannot handle SIGTERM"); 
 	}
-	flag=0;
-	printf("Flag--%d\n",flag);
+	
+	printf("You can press signals\n");
 /*Start data transfer from src file to dest file till it reaches EOF*/
 	while((nbr = read(sFp,buff,1024)) > 0)
 	{
 		if(write(dFp,buff,nbr) != nbr)
-			printf("\nError in writing data to %s\n",argv[2]);
-		printf("You can press signals\n");
-        sleep(5);
-        }
+		printf("\nError in writing data to %s\n",argv[2]);
+		//printf("You can press signals\n");
+        sleep(3); //--sleep is used for checking several signals and last signal will be handled.
+    }
 	flag=1;//completes
 	printf("Flag--%d\n",flag);
 	close(sFp);
 	close(dFp);
+	//handling signals SIGQUIT, SIGINT AND SIGTERM
 	while(flag != 1);//wait for copy completes
 	//return ;
 	printf("Executing Signals\n");
-	if(signal_name == "SIGQUIT ^\ "){
-	printf("latest QUIT signal\n");
+	if(signal_name == "SIGQUIT"){
+	printf("latest QUIT signal ^\\ \n");
    //(*old_sa.sa_handler)(signal);
     sigaction(SIGQUIT,&old_sa,NULL);
     raise(SIGQUIT);
 	}
- else if(signal_name == "SIGINT") {
+	else if(signal_name == "SIGINT") {
    printf("latest INT signal ^C \n");
    //(*old_sa.sa_handler)(signal);
    sigaction(SIGINT,&old_sa,NULL);
     raise(SIGINT);
-  }
- else if(signal_name == "SIGTERM"){
+	}
+	else if(signal_name == "SIGTERM"){
    printf("latest TERM signal\n");
    //(*old_sa.sa_handler)(signal);
 	sigaction(SIGTERM,&old_sa,NULL);
     raise(SIGTERM);
-  }      
+	}      
 
 //exit(0);
 }
