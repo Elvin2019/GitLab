@@ -48,7 +48,7 @@ void my_sleep(int sec)
 	sigfillset(&sa.sa_mask);
 	sigaction(SIGALRM, &sa, NULL);
 	// Get the current signal mask
-	sigprocmask(0, NULL, &mask);
+	//sigprocmask(0, NULL, &mask);
 
 
 // Wait with this mask

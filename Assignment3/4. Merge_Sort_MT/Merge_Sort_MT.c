@@ -58,7 +58,8 @@ void * mergesort(void *a)
         n2.left = mid+1;
         n2.right = p->right;
 
-        if (p->left >= p->right) return "0";
+        if (p->left >= p->right)
+			return "0";
 		// creating 2 threads 
         ret = pthread_create(&tid1, NULL, mergesort, &n1); //creating 1 st thread 
         ret = pthread_create(&tid2, NULL, mergesort, &n2); // 2 nd thread
