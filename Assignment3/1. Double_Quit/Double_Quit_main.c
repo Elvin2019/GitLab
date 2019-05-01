@@ -6,23 +6,17 @@
 
 static struct sigaction sa;
 static int sig_chk = 0;//alarm done
-static int ss_tm = 0;//alarm done
 
 void handler(int );
 void my_sleep(int );
 void alarm_handler(int );
 
-void alarm_handler(int signal)
+void alarm_handler(int signo)
 {
     sig_chk = 1;
-    sigset_t pending;
-    if (sigismember(&pending, SIGQUIT)) {
-       //printf("Caught Second Time, So exit\n"); 
-        ss_tm = 1;
-    }
-}
+} 
 
-void handler(int sgn)
+void handler(int signo)
 {
 	static int cnt=0;
 	cnt++;
@@ -41,36 +35,25 @@ void handler(int sgn)
 void my_sleep(int sec)
 {
 	struct sigaction sa;
-	sigset_t mask;
-	sa.sa_flags = SA_RESTART;
-	sa.sa_handler = &alarm_handler; // Intercept and ignore SIGALRM
-	//sa.sa_flags = SA_RESETHAND; // Remove the handler after first signal
-	sigfillset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART; //when signal called restart and wait  
+	sa.sa_handler = &alarm_handler; // whenever first quit signal is delivered the function will be called 
 	sigaction(SIGALRM, &sa, NULL);
-	// Get the current signal mask
-	//sigprocmask(0, NULL, &mask);
-
-
-// Wait with this mask
-	alarm(sec);
-//sigsuspend(&mask);
+	alarm(sec); //wait 5 second 
 }
 int main() 
 {  
 	char str[100];
 	int len;
 	sa.sa_handler = &handler;
-	sa.sa_flags = SA_RESTART;
-	sigfillset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART; //when signal called restart and wait  
 	if (sigaction(SIGQUIT, &sa, NULL) == -1){
         perror("Error: cannot handle SIGQUIT"); // Should not happen
 	}
    while(1){
-      write(1,"Enter Text :\n",14);
-      len=read(0,str,100);
+      write(1,"Enter Text :\n",14); 
+      len=read(0,str,100); //reading standart input 
 	  write(1,"Given Text :\n",14);
-      write(1,str,len);
-      memset(str,EOF,100);
+      write(1,str,len);	 //printing standart output
    } 
 
 }

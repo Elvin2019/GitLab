@@ -23,12 +23,15 @@
 #define true  1
 #define false 0
 
+struct sigaction sa;
+
 void parse_Command(char* command, char** params);
 int exec_Command(char** params);
 
 int line = false;
+//I have created background process that opening file with fopen function 
 
-void handler(int sig)
+void handler(int signo)
 {
   //sleep(2);
   pid_t pid;
@@ -38,7 +41,8 @@ void handler(int sig)
   char mypid[12];   // ex. 34567
     sprintf(mypid, "%d", pid);
     int len=strlen(mypid);
-    mypid[len++]='.';
+   
+	mypid[len++]='.';
     mypid[len++]='t';
     mypid[len++]='x';
     mypid[len++]='t';
@@ -69,10 +73,9 @@ int main()
 	printf("Welcome to Simple shell: \n");
     char get[BUFFSIZE];
 	
-    struct sigaction sa;
     sa.sa_handler = &handler;
     sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) { // Should not happen
     perror("Error: cannot handle SIGINT");
       }	
 	
@@ -82,11 +85,9 @@ int main()
 	   if(line){
 		   printf(">");
         	}else if((getenv("HOME")!= NULL) && (strcmp(getenv("HOME"), get) == false)){
-			printf(">home>");
-                          
+			printf(">home>");                     
         	}else{
-			printf(">%s>>", get);
-                        
+			printf(">%s>>", get);                   
 		}
 	    if(fgets(command, sizeof(command), stdin) == NULL){
 			break; //reading command form stdin, exit whent ctrl + D
@@ -142,16 +143,17 @@ int exec_Command(char** params)
 
     // Child proces when there exist error
     else if (pid == 0) {
-        pid_t cpid=getpid();
+        pid_t cpid=getpid(); //returns the process ID
         char* error=NULL;
-        char mypid[12];   // ex. 34567
-        sprintf(mypid, "%d", cpid);
-        int len=strlen(mypid);
-        mypid[len++]='.';
+        char mypid[12];  
+        sprintf(mypid, "%d", cpid); //mpid char = cpid - process number  example: 1522
+        int len=strlen(mypid); //length = process id character size 
+        mypid[len++]='.'; 
         mypid[len++]='t';
         mypid[len++]='x';
         mypid[len++]='t';
         mypid[len]='\0';
+		// addindg end of process id + .txt,  
         int fd=open(mypid, O_WRONLY|O_CREAT, 0666);
         close(1);
         dup2(fd,1);
