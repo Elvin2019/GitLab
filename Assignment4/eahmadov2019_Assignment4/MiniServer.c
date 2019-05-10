@@ -11,9 +11,9 @@
 #include <sys/sendfile.h>
 
 
-#define PORT 9000
+#define PORT 9000 //port number is given 
 
-//static web page content
+//static web page html content 
 char web_content[] = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\r\n\r\n"
 "<!DOCTYPE html>\r\n"
 "<html> <head> <title>A very simple webpage</title> <basefont size=4> </head>\r\n"
@@ -51,11 +51,12 @@ int main(int argc, char const *argv[])
         perror("In socket");
         exit(1);
     }
+	//last_fd = fd_s;
     setsockopt(fd_s, SOL_SOCKET,SO_REUSEADDR, &on, sizeof(int));
 
-    s_addr.sin_family = AF_INET;
-    s_addr.sin_addr.s_addr = INADDR_ANY;
-    s_addr.sin_port = htons( PORT );
+    s_addr.sin_family = AF_INET; //host byte order
+    s_addr.sin_addr.s_addr = INADDR_ANY; //auto-fill with my IP/
+    s_addr.sin_port = htons( PORT ); //short, network byte order 
     
   //  memset(address.sin_zero, '\0', sizeof address.sin_zero);
     
@@ -64,7 +65,7 @@ int main(int argc, char const *argv[])
     {
         perror("In bind");
 		close(fd_s);
-        exit(EXIT_FAILURE);
+        exit(1);
     }
     if (listen(fd_s, 10) == -1)
     {
@@ -72,6 +73,11 @@ int main(int argc, char const *argv[])
         close(fd_s);
 		exit(1);
     }
+
+
+	 //fcntl(fd_s, F_SETFL, O_NONBLOCK); /* Change the socket into non-blocking state	*/
+    // fcntl(fd_cl, F_SETFL, O_NONBLOCK); /* Change the socket into non-blocking state	*/
+
     while(1)
     {
         printf("\n Mini server is created need to be requested via http://localhost:9000/  \n\n");
@@ -90,10 +96,10 @@ int main(int argc, char const *argv[])
 			read(fd_cl,buf,4095);
 	
 			printf("%s\n", buf);
-		
-			if(!strncmp(buf, "GET /prettypicture.jpg", 22)){
-				fd_img = open("prettypicture.jpg", O_RDONLY);
-				sendfile(fd_cl, fd_img, NULL, 20000); //size is 14700 in sample image 
+			//openning image on browser 
+			if(!strncmp(buf, "GET /prettypicture.jpg", 22)){ //checking 
+				fd_img = open("prettypicture.jpg", O_RDONLY); // open 
+				sendfile(fd_cl, fd_img, NULL, 20000); //size is 14700 in sample image  //send file 
 				close(fd_img);
 			}
 			else 
