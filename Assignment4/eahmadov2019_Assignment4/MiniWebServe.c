@@ -11,9 +11,9 @@
 #include <sys/sendfile.h>
 
 
-#define PORT 9000 //port number is given 
+#define PORT 9000
 
-//static web page html content 
+//static web page content
 char web_content[] = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\r\n\r\n"
 "<!DOCTYPE html>\r\n"
 "<html> <head> <title>A very simple webpage</title> <basefont size=4> </head>\r\n"
@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
     {
         perror("In bind");
 		close(fd_s);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     if (listen(fd_s, 10) == -1)
     {
@@ -90,10 +90,10 @@ int main(int argc, char const *argv[])
 			read(fd_cl,buf,4095);
 	
 			printf("%s\n", buf);
-			//openning image on browser 
-			if(!strncmp(buf, "GET /prettypicture.jpg", 22)){ //checking 
-				fd_img = open("prettypicture.jpg", O_RDONLY); // open 
-				sendfile(fd_cl, fd_img, NULL, 20000); //size is 14700 in sample image  //send file 
+		
+			if(!strncmp(buf, "GET /prettypicture.jpg", 22)){
+				fd_img = open("prettypicture.jpg", O_RDONLY);
+				sendfile(fd_cl, fd_img, NULL, 20000); //size is 14700 in sample image 
 				close(fd_img);
 			}
 			else 
