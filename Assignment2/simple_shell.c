@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LEN 100
+#define MAX_LEN 100 //command length
+#define param 10
+
 
 int main(int argc, char *argv[])
 {

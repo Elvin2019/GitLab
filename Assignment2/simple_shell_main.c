@@ -19,15 +19,13 @@ int main()
     char cmd[MAX_COMMAND_LENGTH ];
     char* params[MAX_NUMBER_OF_PARAMS];
     int cmdCount = 0;
-	printf("Welcome to Simple shell: \n");
 
 
-    while(true) {
+    for( ; ; ) {
 
-        char* u_name = getenv("USER"); //this just print user id name 
-        printf("%s@ >> ", u_name); //print user name + >> shell mark
-
-        if(fgets(cmd, sizeof(cmd), stdin) == NULL) break; //reading command form stdin, exit whent ctrl + D
+        char* u_name = getenv("USER"); 
+        printf("%s@ >> ", u_name);
+        if(fgets(cmd, sizeof(cmd), stdin) == NULL) break; 
        
 	   // Remove trailing newline character, if any
         if(cmd[strlen(cmd)-1] == '\n') {
@@ -80,9 +78,8 @@ int executeCmd(char** params)
         return false;
     }
 
-    // Parent process
     else {
-        // Wait for child process to finish
+      
         int childStatus;
         waitpid(pid, &childStatus, 0);
         return true;
